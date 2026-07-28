@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đăng Ký Môn Học</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, button { padding: 10px; font-size: 16px; margin-top: 10px; }
+        #result { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>📚 Hệ Thống Đăng Ký Môn Học Trực Tuyến</h2>
+    <p>Nhập mã sinh viên của bạn để tiến hành đăng ký:</p>
+
+    <!-- Đã đổi type từ email sang text và đổi ID thành studentIdInput -->
+    <input type="text" id="studentIdInput" placeholder="Ví dụ: SV12345">
+    <button onclick="submitRegisterCourse()">Đăng Ký Ngay</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function submitRegisterCourse() {
+            const studentId = document.getElementById('studentIdInput').value;
+            const resultDiv = document.getElementById('result');
+
+            // Kiểm tra nếu chưa nhập Mã sinh viên
+            if (!studentId.trim()) {
+                resultDiv.style.color = 'red';
+                resultDiv.innerText = '⚠️ Vui lòng nhập Mã Sinh Viên!';
+                return;
+            }
+
+            resultDiv.style.color = 'blue';
+            resultDiv.innerText = '⏳ Đang xử lý đăng ký...';
+
+            try {
+                // Gọi API sang Backend Node.js
+                const response = await fetch('http://localhost:3000/api/register-course', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Đẩy dữ liệu mã sinh viên sang Backend
+                    body: JSON.stringify({ studentId: studentId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.style.color = 'green';
+                    resultDiv.innerText = data.message;
+                } else {
+                    resultDiv.style.color = 'red';
+                    resultDiv.innerText = data.message;
+                }
+            } catch (error) {
+                resultDiv.style.color = 'red';
+                resultDiv.innerText = '⚠️ Không thể kết nối tới Server! Đảm bảo Server Node.js đang chạy ở cổng 3000.';
+            }
+        }
+    </script>
+</body>
+</html>
