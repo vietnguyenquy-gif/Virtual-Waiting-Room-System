@@ -1,0 +1,390 @@
+:root { 
+  --primary: #2563eb;       /* Xanh dương hiện đại */
+  --primary-hover: #1d4ed8; 
+  --danger: #dc2626;        /* Đỏ cho nút Hủy */
+  --danger-hover: #b91c1c;
+  --success: #16a34a;       /* Xanh lá cho sĩ số */
+  --bg: #f8fafc;            /* Màu nền tổng thể dịu mắt */
+  --card: #ffffff; 
+  --text: #1e293b;          /* Màu chữ tối vừa, không bị gắt */
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body { 
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+  margin: 0; 
+  background-color: var(--bg); 
+  color: var(--text); 
+  padding: 30px 15px;
+  line-height: 1.5;
+}
+
+/* Lớp ẩn phần tử */
+.hidden { 
+  display: none !important; 
+}
+
+/* Container chung */
+.container { 
+  width: 100%; 
+  max-width: 1200px; 
+  margin: 0 auto; 
+}
+
+/* Tạo khối Card trắng có bóng mờ */
+.card { 
+  background: var(--card); 
+  padding: 24px; 
+  border-radius: 12px; 
+  box-shadow: var(--shadow); 
+  margin-bottom: 24px; 
+  border: 1px solid var(--border);
+}
+
+h2, h3 { 
+  margin-top: 0; 
+  color: #0f172a; 
+  font-weight: 700;
+}
+
+h2 { font-size: 24px; margin-bottom: 20px; text-align: center; color: var(--primary); }
+h3 { font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+
+/* Form Elements */
+.form-group { 
+  margin-bottom: 16px; 
+}
+
+label { 
+  display: block; 
+  margin-bottom: 6px; 
+  font-weight: 600; 
+  font-size: 14px;
+}
+
+input[type="text"] { 
+  width: 100%; 
+  padding: 12px 14px; 
+  border: 1px solid var(--border); 
+  border-radius: 8px; 
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+input[type="text"]:focus { 
+  border-color: var(--primary); 
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+}
+
+/* Nút bấm chung */
+button { 
+  padding: 12px 20px; 
+  background: var(--primary); 
+  color: white; 
+  border: none; 
+  border-radius: 8px; 
+  font-weight: 600; 
+  font-size: 14px;
+  cursor: pointer; 
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+button:hover { 
+  background: var(--primary-hover); 
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Nút Hủy màu đỏ */
+.btn-cancel {
+  background: var(--danger);
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.btn-cancel:hover {
+  background: var(--danger-hover);
+}
+
+/* Thanh thông tin người dùng phía trên (Top-bar) */
+.top-bar { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  background: var(--card); 
+  padding: 16px 24px; 
+  border-radius: 12px; 
+  margin-bottom: 24px; 
+  border-left: 6px solid var(--primary); 
+  box-shadow: var(--shadow);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.logout-btn { 
+  background: #f1f5f9; 
+  color: #475569;
+  border: 1px solid var(--border);
+}
+
+.logout-btn:hover {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+/* Khối thông báo báo lỗi / thành công */
+.message-box { 
+  margin-top: 16px; 
+  padding: 12px; 
+  border-radius: 8px; 
+  text-align: center; 
+  font-weight: 600; 
+  font-size: 14px;
+}
+
+/* BỐ CỤC LƯỚI 2 CỘT (Danh sách mở bên trái - Đã đăng ký bên phải) */
+.grid-container {
+  display: grid;
+  grid-template-columns: 3fr 2fr; /* Tỷ lệ chiều rộng 60% - 40% */
+  gap: 24px;
+  align-items: start; /* Ngăn 2 cột tự kéo dài bằng nhau */
+}
+
+/* Khi vào màn hình Grid thì bỏ margin-bottom của card con để canh đều */
+.grid-container .card {
+  margin-bottom: 0;
+}
+
+/* Bảng dữ liệu */
+table { 
+  width: 100%; 
+  border-collapse: separate; 
+  border-spacing: 0;
+  margin-top: 8px; 
+}
+
+th, td { 
+  padding: 12px 14px; 
+  border-bottom: 1px solid var(--border); 
+  text-align: left; 
+  font-size: 14px;
+}
+
+th { 
+  background-color: #f8fafc; 
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Huy hiệu (Badges) cho sĩ số */
+.badge { 
+  padding: 4px 10px; 
+  border-radius: 20px; 
+  font-size: 12px; 
+  font-weight: 600; 
+  display: inline-block;
+}
+
+.bg-success { background: #dcfce7; color: var(--success); }
+.bg-danger { background: #fee2e2; color: var(--danger); }
+
+/* Link "Chọn" trong bảng */
+td a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+td a:hover {
+  text-decoration: underline;
+}
+
+/* THÍCH ỨNG MÀN HÌNH NHỎ (Responsive cho Mobile/Tablet) */
+@media (max-width: 850px) {
+  .grid-container { 
+    grid-template-columns: 1fr; /* Gập thành 1 cột chồng lên nhau */
+  }
+  
+  .grid-container .card {
+    margin-bottom: 24px;
+  }
+  
+  .top-bar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .top-bar button {
+    width: 100%;
+  }
+}
+/* ==========================================================================
+   GIAO DIỆN ĐẦU TRANG (HEADER CHUẨN ĐẠI HỌC XÂY DỰNG HÀ NỘI)
+   ========================================================================== */
+
+.huce-header {
+  background-color: #113a6c; /* Màu xanh đậm đặc trưng của HUCE */
+  color: white;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 30px;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 1. Phần Top Main (Logo & Utilities) */
+.header-main {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.huce-logo {
+  height: 65px;
+  width: auto;
+  background: white; 
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.school-name h1 {
+  font-size: 20px;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.school-name span {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  display: block;
+  font-weight: 400;
+}
+
+/* Các nút công cụ bên phải */
+.header-utilities {
+  display: flex;
+  gap: 24px;
+}
+
+.utility-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 12px;
+  gap: 6px;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.utility-item i {
+  font-size: 18px;
+}
+
+.utility-item:hover {
+  opacity: 0.8;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+/* 2. Phần Thanh Điều Hướng (Navbar) */
+.header-nav {
+  background-color: #0c284b; /* Xanh Navy tối hơn phần top */
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nav-list li a {
+  display: block;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.nav-list li a:hover,
+.nav-list li a.active {
+  background-color: #2563eb; /* Sáng lên khi di chuột vào hoặc đang chọn */
+}
+
+.nav-home {
+  font-size: 15px;
+  padding: 13px 18px !important;
+}
+
+/* Thích ứng màn hình nhỏ (Điện thoại/Tablet) */
+@media (max-width: 900px) {
+  .header-main .header-container {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .logo-section {
+    flex-direction: column;
+  }
+  
+  .school-name h1 {
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .header-utilities {
+    width: 100%;
+    justify-content: space-around;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 10px;
+  }
+  
+  .nav-list {
+    justify-content: center;
+  }
+}
