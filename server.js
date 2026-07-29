@@ -46,8 +46,10 @@ db.serialize(() => {
       insert.run('IT101', 'Cấu trúc dữ liệu & Giải thuật', 2); // Chỉ cho 2 slot để test lớp đầy!
       insert.run('IT102', 'Cơ sở dữ liệu', 50);
       insert.run('IT103', 'Trí tuệ nhân tạo', 30);
+      insert.run('IT104', 'Mang máy tính', 40);
+      insert.run('IT105', 'Lập trình Web', 100);
       insert.finalize();
-      console.log('📚 Đã tạo 3 môn học mẫu thành công!');
+      console.log('📚 Đã tạo 5 môn học mẫu thành công!');
     }
   });
 });
