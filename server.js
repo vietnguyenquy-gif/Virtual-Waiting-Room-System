@@ -1,24 +1,53 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-let registeredCourses = []; // Mảng lưu trữ các môn học đã đăng ký (BỔ SUNG MỚI)
+const redis = require('./redis'); // BỔ SUNG: Gọi anh bảo vệ Redis vào làm việc!
+
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// Kết nối Database
+// ==========================================
+// 1. MIDDLEWARE: TẤM KHIÊN CHỐNG SPAM CLICK
+// ==========================================
+async function rateLimitMiddleware(req, res, next) {
+  // Đồng bộ tên biến với Frontend: dùng studentId thay vì student_id
+  const { studentId } = req.body; 
+  
+  if (!studentId) return next();
+
+  const limitKey = `ratelimit:${studentId}`;
+
+  try {
+    const currentRequests = await redis.incr(limitKey);
+    if (currentRequests === 1) await redis.expire(limitKey, 1);
+
+    if (currentRequests > 3) {
+      return res.status(429).json({
+        status: 'error',
+        message: "⚠️ Thao tác quá nhanh! Hệ thống nghi ngờ bạn dùng tool."
+      });
+    }
+    next();
+  } catch (error) {
+    console.error("Lỗi Rate Limit:", error);
+    next();
+  }
+} 
+
+// ==========================================
+// 2. KẾT NỐI VÀ KHỞI TẠO SQLITE
+// ==========================================
 const db = new sqlite3.Database('./database.db', (err) => {
   if (err) console.error('❌ Lỗi kết nối Database:', err.message);
   else console.log('⚡ Đã kết nối thành công tới Database SQLite!');
 });
 
-// Khởi tạo Database & Dữ liệu mẫu
 db.serialize(() => {
   db.run('PRAGMA journal_mode = WAL;');
 
-  // Bảng lưu danh sách môn học (BỔ SUNG MỚI)
   db.run(`
     CREATE TABLE IF NOT EXISTS courses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,30 +58,20 @@ db.serialize(() => {
     )
   `);
 
-  // Bảng lưu lịch sử đăng ký của sinh viên
   db.run(`
     CREATE TABLE IF NOT EXISTS student_registrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       studentId TEXT NOT NULL,
       courseCode TEXT NOT NULL,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(studentId, courseCode) -- Chặn trùng lặp tầng Database
     )
   `);
-
-  // Tự động thêm 3 môn học mẫu nếu bảng courses đang trống
-  db.get("SELECT COUNT(*) as count FROM courses", (err, row) => {
-    if (row && row.count === 0) {
-      const insert = db.prepare("INSERT INTO courses (course_code, course_name, max_slots) VALUES (?, ?, ?)");
-      insert.run('IT101', 'Cấu trúc dữ liệu & Giải thuật', 2); // Chỉ cho 2 slot để test lớp đầy!
-      insert.run('IT102', 'Cơ sở dữ liệu', 50);
-      insert.run('IT103', 'Trí tuệ nhân tạo', 30);
-      insert.run('IT104', 'Mang máy tính', 40);
-      insert.run('IT105', 'Lập trình Web', 100);
-      insert.finalize();
-      console.log('📚 Đã tạo 5 môn học mẫu thành công!');
-    }
-  });
 });
+
+// ==========================================
+// 3. DANH SÁCH API ENDPOINTS
+// ==========================================
 
 // API 1: Đăng nhập
 app.post('/api/login', (req, res) => {
@@ -63,7 +82,7 @@ app.post('/api/login', (req, res) => {
   return res.status(200).json({ status: 'success', studentId });
 });
 
-// API 2: Lấy danh sách môn học (BỔ SUNG MỚI CHO GIAI ĐOẠN 1)
+// API 2: Lấy danh sách môn học hiển thị ra Web
 app.get('/api/courses', (req, res) => {
   db.all("SELECT * FROM courses", [], (err, rows) => {
     if (err) return res.status(500).json({ status: 'error', message: err.message });
@@ -71,45 +90,45 @@ app.get('/api/courses', (req, res) => {
   });
 });
 
-// API 3: Đăng ký môn học (ĐÃ NÂNG CẤP LOGIC KIỂM TRA)
-app.post('/api/register-course', (req, res) => {
+// API 3: ĐĂNG KÝ MÔN HỌC (ĐÃ CHẠY HOÀN TOÀN TRÊN REDIS)
+app.post('/api/register-course', rateLimitMiddleware, async (req, res) => {
+  // Lấy dữ liệu từ Frontend gửi lên (camelCase)
   const { studentId, courseCode } = req.body;
 
   if (!studentId || !courseCode) {
-    return res.status(400).json({ status: 'error', message: '⚠️ Thiếu thông tin sinh viên hoặc mã môn!' });
+    return res.status(400).json({ status: 'error', message: "Thiếu mã sinh viên hoặc mã môn học!" });
   }
 
-  // BƯỚC 1: Kiểm tra xem môn học có tồn tại và còn slot không
-  db.get("SELECT * FROM courses WHERE course_code = ?", [courseCode], (err, course) => {
-    if (err) return res.status(500).json({ status: 'error', message: 'Lỗi Database!' });
-    if (!course) return res.status(404).json({ status: 'error', message: '❌ Môn học không tồn tại!' });
+  // Khớp với định dạng key lúc Warm-up
+  const slotsKey = `course:${courseCode}:slots`;
+  const registeredKey = `course:${courseCode}:registered`;
 
-    // Kiểm tra lớp đầy
-    if (course.current_slots >= course.max_slots) {
-      return res.status(400).json({ status: 'error', message: `⚠️ Lớp [${course.course_name}] đã ĐẦY SĨ SỐ!` });
+  try {
+    // ⚔️ GỌI LUA SCRIPT NGUYÊN TỬ TỪ REDIS
+    const result = await redis.registerCourse(slotsKey, registeredKey, studentId);
+
+    if (result === -1) {
+      return res.status(400).json({ status: 'error', message: "❌ Bạn đã đăng ký môn này rồi!" });
+    }
+    
+    if (result === 0) {
+      return res.status(400).json({ status: 'error', message: " Môn học đã đủ!" });
     }
 
-    // BƯỚC 2: Kiểm tra sinh viên đã đăng ký môn này chưa (Chặn đăng ký trùng)
-    db.get("SELECT * FROM student_registrations WHERE studentId = ? AND courseCode = ?", [studentId, courseCode], (err, reg) => {
-      if (reg) {
-        return res.status(400).json({ status: 'error', message: '⚠️ Bạn đã đăng ký môn này rồi!' });
-      }
+    if (result === 1) {
+      // Thành công trên RAM!
+      return res.status(200).json({ status: 'success', message: "🎉 Đăng ký thành công !" });
+    }
 
-      // BƯỚC 3: Thỏa mãn hết -> Tăng sĩ số + Lưu lịch sử đăng ký
-      db.run("UPDATE courses SET current_slots = current_slots + 1 WHERE course_code = ?", [courseCode], (err) => {
-        if (err) return res.status(500).json({ status: 'error', message: 'Lỗi cập nhật sĩ số!' });
-
-        db.run("INSERT INTO student_registrations (studentId, courseCode) VALUES (?, ?)", [studentId, courseCode], function(err) {
-          if (err) return res.status(500).json({ status: 'error', message: 'Lỗi lưu lịch sử!' });
-          
-          console.log(`✅ [MSV: ${studentId}] đăng ký thành công môn [${courseCode}]`);
-          return res.status(200).json({ status: 'success', message: `🎉 Đăng ký thành công môn: ${course.course_name}!` });
-        });
-      });
-    });
-  });
+  } catch (error) {
+    console.error("Lỗi server Redis:", error);
+    return res.status(500).json({ status: 'error', message: "Lỗi hệ thống!" });
+  }
 });
 
+// ==========================================
+// 4. CHẠY SERVER
+// ==========================================
 app.listen(port, () => {
   console.log(`🚀 Server đang chạy tại địa chỉ: http://localhost:${port}`);
 });

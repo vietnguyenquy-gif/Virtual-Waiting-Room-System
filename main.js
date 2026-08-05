@@ -165,3 +165,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (quickForm) quickForm.addEventListener('submit', registerCourse);
     }
 });
+// Ví dụ mẫu trong file main.js của bạn
+async function dangKyMonHoc(studentId, courseCode) {
+  try {
+    const response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        student_id: studentId,
+        course_code: courseCode
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      alert("🎉 " + data.message);
+      // Tải lại trang hoặc cập nhật lại sĩ số trên màn hình
+    } else {
+      alert("❌ " + data.message);
+    }
+  } catch (error) {
+    console.error("Lỗi kết nối:", error);
+  }
+}
