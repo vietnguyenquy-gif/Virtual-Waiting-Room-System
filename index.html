@@ -3,58 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Đăng Ký Môn Học</title>
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Đăng Ký Môn Học</title>
+  <title>Hệ Thống Đăng Ký Môn Học - HUCE</title>
   <!-- Thư viện icon FontAwesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Liên kết file CSS bên ngoài ở đây -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Liên kết file CSS bên ngoài -->
   <link rel="stylesheet" href="style.css">
 </head>
-</head>
 <body>
+
 <!-- GIAO DIỆN ĐẦU TRANG CHUẨN HUCE -->
 <header class="huce-header">
-  <!-- Phần 1: Top Bar (Logo & Các công cụ tiện ích) -->
   <div class="header-main">
     <div class="header-container">
-      
-      <!-- Cụm Logo & Tên trường -->
       <div class="logo-section">
-        <!-- Bạn có thể thay src bằng file ảnh logo.png tại máy của bạn -->
         <img src="LOGO_DHXD.png" alt="HUCE Logo" class="huce-logo">
         <div class="school-name">
           <h1>TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI</h1>
           <span>Hanoi University of Civil Engineering</span>
         </div>
       </div>
-
-      <!-- Cụm Icon bên phải -->
       <div class="header-utilities">
-        <a href="#" class="utility-item">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Tìm kiếm</span>
-        </a>
-        <a href="#" class="utility-item">
-          <i class="fa-solid fa-globe"></i>
-          <span>English</span>
-        </a>
-        <a href="#" class="utility-item">
-          <i class="fa-solid fa-th"></i>
-          <span>Các ứng dụng</span>
-        </a>
+        <a href="#" class="utility-item"><i class="fa-solid fa-magnifying-glass"></i><span>Tìm kiếm</span></a>
+        <a href="#" class="utility-item"><i class="fa-solid fa-globe"></i><span>English</span></a>
+        <a href="#" class="utility-item"><i class="fa-solid fa-th"></i><span>Các ứng dụng</span></a>
         <a href="#" class="utility-item" onclick="alert('Vui lòng dùng form đăng nhập bên dưới!')">
-          <i class="fa-solid fa-user"></i>
-          <span>Đăng nhập</span>
+          <i class="fa-solid fa-user"></i><span>Đăng nhập</span>
         </a>
       </div>
-
     </div>
   </div>
 
-  <!-- Phần 2: Thanh Menu Điều Hướng (Navbar) -->
   <nav class="header-nav">
     <div class="header-container">
       <ul class="nav-list">
@@ -71,141 +49,67 @@
     </div>
   </nav>
 </header>
-  <div class="container">
-    <!-- GIAO DIỆN ĐĂNG NHẬP -->
-    <div id="loginSection" class="card">
-      <h2>Cổng Đăng Nhập</h2>
-      <form id="loginForm">
-        <div class="form-group">
-          <label>Mã Sinh Viên:</label>
-          <input type="text" id="studentIdInput" placeholder="Ví dụ: 1018870" required>
-        </div>
-        <button type="submit">Đăng Nhập</button>
-      </form>
-      <div id="loginMessage" class="message-box hidden"></div>
-    </div>
 
-    <!-- GIAO DIỆN SINH VIÊN -->
-    <div id="studentDashboard" class="hidden">
-      <div class="top-bar">
-        <span>MSV: <strong id="currentStudentId" style="color: var(--primary);"></strong></span>
-        <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+<div class="container">
+  <!-- 1. CỔNG ĐĂNG NHẬP -->
+  <div id="loginSection" class="card">
+    <h2>Cổng Đăng Nhập</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Mã Sinh Viên:</label>
+        <input type="text" id="studentIdInput" placeholder="Ví dụ: 1018870" required>
       </div>
-
-      <!-- DANH SÁCH MÔN HỌC -->
-      <div class="card">
-        <h3>Danh Sách Môn Học Đang Mở</h3>
-        <table>
-          <thead>
-            <tr><th>Mã môn</th><th>Tên môn</th><th>Sĩ số</th><th>Hành động</th></tr>
-          </thead>
-          <tbody id="courseTableBody"></tbody>
-        </table>
-      </div>
-
-      <!-- FORM ĐĂNG KÝ -->
-      <div class="card">
-        <h3>Đăng Ký Môn Học</h3>
-        <form id="courseForm">
-          <div class="form-group">
-            <label>Nhập Mã Môn Học (Ví dụ: IT101):</label>
-            <input type="text" id="courseCodeInput" required>
-          </div>
-          <button type="submit">Xác Nhận Đăng Ký</button>
-        </form>
-        <div id="courseMessage" class="message-box hidden"></div>
-      </div>
-    </div>
+      <button type="submit">Đăng Nhập</button>
+    </form>
+    <div id="loginMessage" class="message-box hidden"></div>
   </div>
 
-  <script>
-    let loggedInStudentId = '';
+  <!-- 2. GIAO DIỆN BÊN TRONG (ẨN TRƯỚC KHI ĐĂNG NHẬP) -->
+  <div id="studentDashboard" class="hidden">
+    <div class="top-bar">
+      <span>MSV: <strong id="currentStudentId" style="color: var(--primary);"></strong></span>
+      <button class="logout-btn" onclick="location.reload()">Đăng xuất</button>
+    </div>
 
-    function showMsg(el, text, isSuccess) {
-      el.innerText = text;
-      el.style.background = isSuccess ? '#d4edda' : '#f8d7da';
-      el.style.color = isSuccess ? '#155724' : '#721c24';
-      el.classList.remove('hidden');
-    }
+    <!-- Bảng 1: Danh sách môn học đang mở -->
+    <div class="card">
+      <h3>Danh Sách Môn Học Đang Mở</h3>
+      <table>
+        <thead>
+          <tr><th>Mã môn</th><th>Tên môn</th><th>Sĩ số</th><th>Hành động</th></tr>
+        </thead>
+        <tbody id="courseTableBody"></tbody>
+      </table>
+    </div>
 
-    // 1. Đăng nhập
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const studentId = document.getElementById('studentIdInput').value.trim();
-      const res = await fetch('http://localhost:3000/api/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        loggedInStudentId = data.studentId;
-        document.getElementById('currentStudentId').innerText = loggedInStudentId;
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('studentDashboard').classList.remove('hidden');
-        loadCourses(); // Tải danh sách môn học ngay sau khi đăng nhập
-      } else {
-        showMsg(document.getElementById('loginMessage'), data.message, false);
-      }
-    });
+    <!-- Form Đăng Ký -->
+    <div class="card">
+      <h3>Đăng Ký Môn Học</h3>
+      <form id="courseForm">
+        <div class="form-group">
+          <label>Nhập Mã Môn Học (Ví dụ: IT101):</label>
+          <input type="text" id="courseCodeInput" required>
+        </div>
+        <button type="submit">Xác Nhận Đăng Ký</button>
+      </form>
+      <div id="courseMessage" class="message-box hidden"></div>
+    </div>
 
-    // 2. Tải danh sách môn học
-    async function loadCourses() {
-      const res = await fetch('http://localhost:3000/api/courses');
-      const data = await res.json();
-      const tbody = document.getElementById('courseTableBody');
-      tbody.innerHTML = '';
-      
-      data.data.forEach(c => {
-        const isFull = c.current_slots >= c.max_slots;
-        const badgeClass = isFull ? 'bg-danger' : 'bg-success';
-        tbody.innerHTML += `
-          <tr>
-            <td><strong>${c.course_code}</strong></td>
-            <td>${c.course_name}</td>
-            <td><span class="badge ${badgeClass}">${c.current_slots} / ${c.max_slots}</span></td>
-            <td><a href="#" onclick="fillCourse('${c.course_code}')" style="color:blue;">Chọn</a></td>
-          </tr>
-        `;
-      });
-    }
+    <!-- Bảng 2: Môn học ĐÃ đăng ký (ĐÃ ĐƯỢC CHUYỂN VÀO ĐÚNG CHỖ) -->
+    <div class="card" id="my-registered-card" style="display:none;">
+      <h3 class="title">Môn Học Đã Đăng Ký(<span id="total-registered">0</span>)</h3>
+      <table>
+        <thead>
+          <tr><th>Mã môn</th><th>Tên môn</th><th>Hành động</th></tr>
+        </thead>
+        <tbody id="registered-list"></tbody>
+      </table>
+    </div>
 
-    function fillCourse(code) {
-      document.getElementById('courseCodeInput').value = code;
-    }
+  </div> <!-- Hết studentDashboard -->
+</div> <!-- Hết container -->
 
-    // 3. Đăng ký môn
-    document.getElementById('courseForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const courseCode = document.getElementById('courseCodeInput').value.trim();
-      const msgEl = document.getElementById('courseMessage');
-      
-      const res = await fetch('http://localhost:3000/api/register-course', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId: loggedInStudentId, courseCode })
-      });
-      const data = await res.json();
-      
-      showMsg(msgEl, data.message, res.ok);
-      if (res.ok) {
-        loadCourses(); // Cập nhật lại số lượng sĩ số ngay lập tức
-        document.getElementById('courseCodeInput').value = '';
-      }
-    });
-
-    function logout() {
-      location.reload();
-    }
-  </script>
-<div class="card" id="my-registered-card" style="display:none;">
-  <h3 class="title">Môn Học Đã Đăng Ký(<span id="total-registered">0</span>)</h3>
-  <table>
-    <thead>
-      <tr><th>Mã môn</th><th>Tên môn</th><th>Hành động</th></tr>
-    </thead>
-    <tbody id="registered-list"></tbody>
-  </table>
-</div>
-
+<!-- CHỈ GỌI MỘT FILE JS DUY NHẤT -->
 <script src="main.js"></script>
 </body>
 </html>
